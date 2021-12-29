@@ -49,14 +49,13 @@ public class HandlersDemo {
 
         config = ConfigurationBuilder.slowAndSteady();
 
-        //inject an exception 99% of the times.
+        //inject an AmazonClientException exception 99% of the times.
         s3Client = AmazonS3ClientBuilder.standard().
                 withRequestHandlers(new ProgrammableExceptionRequestHandler(new AmazonClientException("test"), 0.99)).
                 withClientConfiguration(config).
                 build();
 
         listS3Buckets(s3Client, "Programmable Exception Demo");
-
     }
 
 
