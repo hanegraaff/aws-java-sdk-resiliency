@@ -1,11 +1,14 @@
-# AWS Resiliency for Java SDK
+# Resiliency for AWS Java SDK
 This library augments the AWS Java SDK by providing the following capabilities.
 
-1. Provides pre-configured `ClientConfiguration` objects tailored to different use cases.
+1. Generate pre-configured `ClientConfiguration` objects tailored to different use cases. The use cases supported so far are:
+    - Long running batch jobs. Each SDK operation will retry for up to 10 minutes.
+    - Fail-fast apps that can tolerate failures. Each SDK operarion will retry for up to 50 seconds.
+    - Responsive UIs, where a failure means that a user will simply try again later. Each SDK operation will be retried for up to 8 seconds.
 
 2. Provides special Request Handlers (`RequestHandler2` derived classes) that can be used to evaluate the health of an AWS Service (for production code) or inject errors and delays (for test code).
 
-The code supplied in this project is inteded to explore ideas around resiliency and testing of the AWS SDK. Initial development is completed, but this library is not currently available as a public maven artifact.
+The code supplied in this project is inteded to explore ideas around resiliency and testing of code that relies on the AWS SDK. Initial development is completed, but this library is not currently available as a public maven artifact.
 
 
 # How to use this library
@@ -105,10 +108,10 @@ List<Bucket> buckets = s3ClientWithExceptions.listBuckets();
 // The following snippet will inject a delay 10% (0.1) of the times
 // and last berween 1 - 4 seconds
 //
-AmazonS3 s3ClientWithExceptions = AmazonS3ClientBuilder.standard().
+AmazonS3 s3ClientWithDelay = AmazonS3ClientBuilder.standard().
                 withRequestHandlers(new NetworkDelayRequestHandler(0.1, 1000, 3000)).
                 withClientConfiguration(ConfigurationBuilder.slowAndSteady()).
                 build();
 
-buckets = s3ClientWithExceptions.listBuckets();
+buckets = s3ClientWithDelay.listBuckets();
 ```
